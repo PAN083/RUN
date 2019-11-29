@@ -1,0 +1,67 @@
+import os
+import pandas as pd
+import numpy as np
+import logging
+
+file_src = r'E:\expdata\exp1\formal\test'
+output_src = r'E:\expdata\exp1\formal\eyemoveConvert'
+os.chdir(file_src)
+logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s -  \
+                    %(levelname)s - %(message)s')
+def convert_to_pd(files):
+    """
+    :param file_list:待转换的眼动文件
+    """
+    with open(files) as f:
+        data = f.read().split('\n')[6:]
+
+    columns = data[0].split('\t')
+    data_list = [i.split('\t') for i in data]
+
+    df = pd.DataFrame(data_list[1:], columns=columns)
+    df = df.drop(df[(df.GazePointXLeft.isnull()) | 
+        (df.TimeStamp == 'TimeStamp')].index.tolist())
+    df_convert = df.loc[:, columns[0:11]].astype(float)
+    df['Event'] = df['Event'].replace('', np.nan)
+    df_convert['Event'] = df['Event'].astype(float)
+    return df_convert
+def get_file_list(file_src):
+    """
+    获取待处理的文件名称.
+    :param files_src: 输入路径
+    """
+    file_lists = []
+    for foldername, subfolders, folders in os.walk(file_src):
+        for i in folders:
+            if i.endswith('xls'):
+                file_lists.append(i)
+    return file_lists
+
+def data_process(df):
+    """
+    转为原点; 更改Event中trigger; 更改空值.
+    :param df:转换后的dataframe
+    """
+    df['Event'] = df['Event'].fillna(method='ffill')
+    df['Event'] = df['Event'].fillna('Event')
+    df = df.drop(df[df.Event == 'Event'].index.tolist())
+    df = df.drop(df[(df.Event == '1') | (df.Event == '0')].index.tolist())
+    df.loc[:, ['GazePointXLeft', 'GazePointXRight', 'GazePointX']] = df.loc[:,
+              ['GazePointXLeft', 'GazePointXRight', 'GazePointX']] + 960
+    df.loc[:, ['GazePointYLeft', 'GazePointYRight', 'GazePointY']] = df.loc[:,
+              ['GazePointYLeft', 'GazePointYRight', 'GazePointY']] + 540
+    df = df.fillna(-1)
+    return df
+def main():
+    file_lists = get_file_list(file_src)
+    try:
+        for i in file_lists:
+            file_name = i.split('.')[0] + '_convert.xlsx'
+            df_convert = convert_to_pd(i)
+            df_out = data_process(df_convert)
+            df_out.to_excel(output_src + os.sep + file_name, index=False)
+            logging.debug(i.split('.')[0] + ' is converted!')
+    except:
+        logging.debug(i.split('.')[0] + ' has some problems!')
+if __name__ == "__main__":
+    main()
