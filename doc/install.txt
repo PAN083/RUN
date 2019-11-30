@@ -3,9 +3,12 @@
 Tobii eye tracker 4C
 智能硬件控制演示装置
 
-开发环境：
-Python IDE
-C++ IDE
+系统环境：
+Windows 10
+
+编译环境：
+OpenCV – 4.1.1
+Python 3.6.5
 
 以及opencv-contrib-python
 
