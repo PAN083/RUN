@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s -  \
                     %(levelname)s - %(message)s')
 def convert_to_pd(files):
     """
-    :param file_list:´ı×ª»»µÄÑÛ¶¯ÎÄ¼ş
+    :param file_list:å¾…è½¬æ¢çš„çœ¼åŠ¨æ–‡ä»¶
     """
     with open(files) as f:
         data = f.read().split('\n')[6:]
@@ -27,8 +27,8 @@ def convert_to_pd(files):
     return df_convert
 def get_file_list(file_src):
     """
-    »ñÈ¡´ı´¦ÀíµÄÎÄ¼şÃû³Æ.
-    :param files_src: ÊäÈëÂ·¾¶
+    è·å–å¾…å¤„ç†çš„æ–‡ä»¶åç§°.
+    :param files_src: è¾“å…¥è·¯å¾„
     """
     file_lists = []
     for foldername, subfolders, folders in os.walk(file_src):
@@ -39,8 +39,8 @@ def get_file_list(file_src):
 
 def data_process(df):
     """
-    ×ªÎªÔ­µã; ¸ü¸ÄEventÖĞtrigger; ¸ü¸Ä¿ÕÖµ.
-    :param df:×ª»»ºóµÄdataframe
+    è½¬ä¸ºåŸç‚¹; æ›´æ”¹Eventä¸­trigger; æ›´æ”¹ç©ºå€¼.
+    :param df:è½¬æ¢åçš„dataframe
     """
     df['Event'] = df['Event'].fillna(method='ffill')
     df['Event'] = df['Event'].fillna('Event')
